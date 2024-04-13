@@ -5,9 +5,14 @@ import { GameBoardComponent } from '../game-board/game-board.component';
   selector: 'app-game-manager',
   standalone: true,
   imports: [GameBoardComponent],
-  template: `<section class="  w-full h-full ">
+  template: `<section
+    class=" flex-1 lg:flex  flex-col items-center justify-center relative"
+  >
     <h3>Turn {{ turn }}</h3>
-    <app-game-board [gameBoard]="{ state: state }" />
+    <app-game-board
+      class=" w-100 h-100 aspect-square flex-1  lg:flex  flex-col relative "
+      [gameBoard]="{ state: state }"
+    />
   </section>`,
 })
 export class GameManagerComponent {

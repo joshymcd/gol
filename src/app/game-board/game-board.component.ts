@@ -7,23 +7,24 @@ import { CommonModule, NgClass } from '@angular/common';
   standalone: true,
   imports: [CommonModule, NgClass],
   template: `
-    <p>Game Board Size {{ gameBoard.state.length }}</p>
-    <div
-      style="
-        display: grid; 
+    <div class="border   aspect-square rounded-lg overflow-hidden">
+      <div
+        style=" 
         grid-template-columns: repeat({{
-        gameBoard.state.length
-      }}, minmax(0, 1fr));
+          gameBoard.state.length
+        }}, minmax(0, 1fr));
+      grid-template-rows: repeat(gameBoard.state.length, minmax(0, 1fr));
       "
-      class=" border w-full gap-1 "
-    >
-      <div *ngFor="let row of gameBoard.state">
-        <div
-          *ngFor="let cell of row"
-          class="aspect-square"
-          [ngClass]="cell ? 'bg-black' : 'bg-white'"
-        >
-          &nbsp;
+        class="grid h-full  bg-gray-800 "
+      >
+        <div *ngFor="let row of gameBoard.state">
+          <div
+            *ngFor="let cell of row"
+            class=" aspect-square "
+            [ngClass]="cell ? 'bg-black border border-white' : 'bg-white'"
+          >
+            &nbsp;
+          </div>
         </div>
       </div>
     </div>
