@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Inject, inject } from '@angular/core';
 import { GameBoardComponent } from '../game-board/game-board.component';
+import { GameBoardState, GameManagerService } from '../game-manager.service';
 
 @Component({
   selector: 'app-game-manager',
@@ -8,58 +9,42 @@ import { GameBoardComponent } from '../game-board/game-board.component';
   template: `<section
     class=" flex-1 lg:flex  flex-col items-center justify-center relative"
   >
-    <h3>Turn {{ turn }}</h3>
+    <section class="flex flex-row gap-2 p-2 items-center justify-center">
+      <h3>Turn {{ turn }}</h3>
+      <button class="border rounded-md px-2 py-1" (click)="nextTurn()">Step</button>
+      <button class="border rounded-md px-2 py-1" (click)="intervalId ? stop() :start()">Auto {{intervalId ? "Stop" : "Start"}}</button> 
+    </section>
     <app-game-board
       class=" w-100 h-100 aspect-square flex-1  lg:flex  flex-col relative "
-      [gameBoard]="{ state: state }"
+      [gameBoardState]="currentGameState"
     />
   </section>`,
 })
 export class GameManagerComponent {
+  intervalId?: number;
+  gameManagerService: GameManagerService = inject(GameManagerService);
+  currentGameState: GameBoardState;
   turn = 0;
   size = 20;
-  state = Array.from({ length: this.size }, () =>
-    Array.from({ length: this.size }, () => false)
-  );
+ 
 
   constructor() {
-    // this.size = 12;
-    this.state = Array.from({ length: this.size }, () =>
-      Array.from({ length: this.size }, () => Math.random() > 0.9)
-    );
-    setInterval(() => {
-      // this.size++;
-      // this.state = Array.from({ length: this.size }, () =>
-      //   Array.from({ length: this.size }, () => Math.random() > 0.9)
-      // );
-      this.turn++;
-      this.state = calcNextState(this.state);
-    }, 1000);
+    this.currentGameState = this.gameManagerService.createNewGame(this.size, true);
+ 
+  }
+
+  nextTurn() {
+    this.turn++;
+    this.currentGameState = this.gameManagerService.getNextState();
+  }
+
+  start() {
+    console.log(this);
+    this.intervalId = setInterval(this.nextTurn.bind(this), 1000) ;
+  }
+
+  stop() {
+    clearInterval(this.intervalId);
+    this.intervalId = undefined;
   }
 }
-
-const calcNextState = (state: boolean[][]): boolean[][] => {
-  const nextState = Array.from({ length: state.length }, () =>
-    Array.from({ length: state[0].length }, () => false)
-  );
-  for (let i = 0; i < state.length; i++) {
-    for (let j = 0; j < state[i].length; j++) {
-      const neighbors = [
-        state[i - 1]?.[j - 1],
-        state[i - 1]?.[j],
-        state[i - 1]?.[j + 1],
-        state[i]?.[j - 1],
-        state[i]?.[j + 1],
-        state[i + 1]?.[j - 1],
-        state[i + 1]?.[j],
-        state[i + 1]?.[j + 1],
-      ].filter((x) => x).length;
-      if (state[i][j]) {
-        nextState[i][j] = neighbors === 2 || neighbors === 3;
-      } else {
-        nextState[i][j] = neighbors === 3;
-      }
-    }
-  }
-  return nextState;
-};
